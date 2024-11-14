@@ -1,4 +1,24 @@
+import { getDatabase, ref, onValue } from "firebase/database";
+import { useEffect, useState } from "react";
+
 const Header = () => {
+  const [header, setHeader] = useState(null); // Initialize with null or an appropriate default value
+
+  useEffect(() => {
+    const db = getDatabase();
+    const headerRef = ref(db, "header/");
+
+    // Set up the listener for the header data
+    const unsubscribe = onValue(headerRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log(data); // Log the data to the console
+      setHeader(data); // Optionally set the header state if needed
+    });
+
+    // Cleanup listener on component unmount
+    return () => unsubscribe();
+  }, []);
+
   return (
     <header className="site-header reveal-from-bottom">
       <div className="container">
@@ -27,9 +47,7 @@ const Header = () => {
                 <li>
                   <a href="#">Home</a>
                 </li>
-                <li>
-                  <a href="#">Features</a>
-                </li>
+                {header.title}
                 <li>
                   <a href="#">Pricing</a>
                 </li>
